@@ -3,33 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speed Tracker</title>
+    <title>Speed Tracker Pro</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Speed Tracker</h1>
-        <div class="speed-display">
-            <div id="speed">0</div>
-            <div class="unit">km/h</div>
-        </div>
-        <div class="info-container">
-            <div class="info-box">
-                <label>Max Speed:</label>
-                <span id="maxSpeed">0 km/h</span>
+    <div class="app-container">
+        <nav class="top-nav">
+            <div class="nav-brand">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Speed Tracker</span>
             </div>
-            <div class="info-box">
-                <label>Average Speed:</label>
-                <span id="avgSpeed">0 km/h</span>
+            <div class="nav-menu">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
             </div>
-        </div>
-        <div class="location-info">
-            <div id="latitude">Latitude: --</div>
-            <div id="longitude">Longitude: --</div>
-        </div>
-        <button id="startTracking">Start Tracking</button>
-        <button id="stopTracking" disabled>Stop Tracking</button>
-        <div id="status" class="status">Click Start Tracking to begin</div>
+        </nav>
+
+        <main class="main-content">
+            <div class="speed-card">
+                <div class="speed-display">
+                    <div class="speed-label">Your Current Speed Is...</div>
+                    <div class="speed-value">
+                        <span id="speed">0</span>
+                        <span class="unit">km/h</span>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-trophy"></i>
+                        <div class="stat-value" id="maxSpeed">0 km/h</div>
+                        <div class="stat-label">Max Speed</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line"></i>
+                        <div class="stat-value" id="avgSpeed">0 km/h</div>
+                        <div class="stat-label">Average Speed</div>
+                    </div>
+                </div>
+
+                <div class="location-card">
+                    <div class="conversion-header">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Speed Conversion</span>
+                    </div>
+                    <div class="conversion-grid">
+                        <div class="conversion-card" id="mphConversion">
+                            <div class="conversion-value">0 mph</div>
+                            <button class="conversion-btn" data-unit="mph">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Convert to MPH
+                            </button>
+                        </div>
+                        <div class="conversion-card" id="msConversion">
+                            <div class="conversion-value">0 m/s</div>
+                            <button class="conversion-btn" data-unit="ms">
+                                <i class="fas fa-wind"></i>
+                                Convert to m/s
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-buttons">
+                    <button id="startTracking" class="btn btn-primary">
+                        <i class="fas fa-play"></i>
+                        Start Tracking
+                    </button>
+                    <button id="stopTracking" class="btn btn-danger" disabled>
+                        <i class="fas fa-stop"></i>
+                        Stop Tracking
+                    </button>
+                </div>
+
+                <div class="status-container">
+                    <div id="status" class="status">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Click Start Tracking to begin</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>Created by <a href="https://github.com/Jubayer-Hossen" target="_blank">Jubayer-Hossen</a></p>
+            <p class="version">v1.0.0</p>
+        </footer>
     </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>

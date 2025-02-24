@@ -1,3 +1,44 @@
+// Add this at the beginning of your existing script.js file
+document.addEventListener('DOMContentLoaded', () => {
+    // Theme toggling functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    // Set initial theme based on user preference
+    if (prefersDarkScheme.matches) {
+        document.body.setAttribute('data-theme', 'dark');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.body.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+            document.body.removeAttribute('data-theme');
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        } else {
+            document.body.setAttribute('data-theme', 'dark');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+    });
+
+    // Add this to your SpeedTracker class
+    const speedDisplay = document.querySelector('.speed-display');
+    
+    // Modify your startTracking method to add the tracking class
+    const originalStartTracking = SpeedTracker.prototype.startTracking;
+    SpeedTracker.prototype.startTracking = function() {
+        speedDisplay.classList.add('tracking');
+        originalStartTracking.call(this);
+    };
+
+    // Modify your stopTracking method to remove the tracking class
+    const originalStopTracking = SpeedTracker.prototype.stopTracking;
+    SpeedTracker.prototype.stopTracking = function() {
+        speedDisplay.classList.remove('tracking');
+        originalStopTracking.call(this);
+    };
+});
+
 class SpeedTracker {
     constructor() {
         this.speeds = [];
@@ -15,6 +56,8 @@ class SpeedTracker {
         this.stopButton = document.getElementById('stopTracking');
         this.latitudeDisplay = document.getElementById('latitude');
         this.longitudeDisplay = document.getElementById('longitude');
+        this.mphConversion = document.querySelector('#mphConversion .conversion-value');
+        this.msConversion = document.querySelector('#msConversion .conversion-value');
 
         // Bind methods
         this.startTracking = this.startTracking.bind(this);
@@ -26,8 +69,85 @@ class SpeedTracker {
         // Add event listeners
         this.startButton.addEventListener('click', this.startTracking);
         this.stopButton.addEventListener('click', this.stopTracking);
+
+        // Add conversion buttons
+        const conversionButtons = document.querySelectorAll('.conversion-btn');
+        conversionButtons.forEach(button => {
+            button.addEventListener('click', () => this.toggleConversion(button.dataset.unit));
+        });
+
+        // Track active conversion
+        this.activeConversions = {
+            mph: false,
+            ms: false
+        };
+
+        // Conversion factors
+        this.conversions = {
+            mph: 0.621371, // km/h to mph
+            ms: 0.277778   // km/h to m/s
+        };
     }
 
+    toggleConversion(unit) {
+        this.activeConversions[unit] = !this.activeConversions[unit];
+        const button = document.querySelector(`[data-unit="${unit}"]`);
+        
+        if (this.activeConversions[unit]) {
+            button.style.background = 'var(--primary-color)';
+            button.style.color = 'white';
+            button.innerHTML = `<i class="fas fa-times"></i> Hide ${unit.toUpperCase()}`;
+        } else {
+            button.style.background = 'transparent';
+            button.style.color = 'var(--primary-color)';
+            button.innerHTML = `<i class="${unit === 'mph' ? 'fas fa-tachometer-alt' : 'fas fa-wind'}"></i> Convert to ${unit.toUpperCase()}`;
+        }
+        
+        // Update conversion displays
+        this.updateConversions(parseFloat(this.speedDisplay.textContent));
+    }
+
+    updateConversions(speedKmh) {
+        if (this.activeConversions.mph) {
+            const mph = speedKmh * this.conversions.mph;
+            this.mphConversion.textContent = `${mph.toFixed(1)} mph`;
+        } else {
+            this.mphConversion.textContent = '0 mph';
+        }
+
+        if (this.activeConversions.ms) {
+            const ms = speedKmh * this.conversions.ms;
+            this.msConversion.textContent = `${ms.toFixed(1)} m/s`;
+        } else {
+            this.msConversion.textContent = '0 m/s';
+        }
+    }
+
+    updateSpeed(position) {
+        if (!this.isTracking) return;
+
+        const speed = position.coords.speed ? position.coords.speed * 3.6 : 0; // Convert m/s to km/h
+        this.speeds.push(speed);
+        
+        // Update current speed
+        this.speedDisplay.textContent = speed.toFixed(1);
+
+        // Update conversions
+        this.updateConversions(speed);
+
+        // Update max speed
+        if (speed > this.maxSpeed) {
+            this.maxSpeed = speed;
+            this.maxSpeedDisplay.textContent = `${speed.toFixed(1)} km/h`;
+        }
+
+        // Update average speed
+        const avgSpeed = this.speeds.reduce((a, b) => a + b, 0) / this.speeds.length;
+        this.avgSpeedDisplay.textContent = `${avgSpeed.toFixed(1)} km/h`;
+
+        this.updateStatus('Tracking active');
+    }
+    
     async sendSpeedData(speed, latitude, longitude) {
         try {
             const response = await fetch('/api/speed', {
