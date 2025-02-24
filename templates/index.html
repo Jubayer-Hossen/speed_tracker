@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Speed Tracker</h1>
+        <div class="speed-display">
+            <div id="speed">0</div>
+            <div class="unit">km/h</div>
+        </div>
+        <div class="info-container">
+            <div class="info-box">
+                <label>Max Speed:</label>
+                <span id="maxSpeed">0 km/h</span>
+            </div>
+            <div class="info-box">
+                <label>Average Speed:</label>
+                <span id="avgSpeed">0 km/h</span>
+            </div>
+        </div>
+        <div class="location-info">
+            <div id="latitude">Latitude: --</div>
+            <div id="longitude">Longitude: --</div>
+        </div>
+        <button id="startTracking">Start Tracking</button>
+        <button id="stopTracking" disabled>Stop Tracking</button>
+        <div id="status" class="status">Click Start Tracking to begin</div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
